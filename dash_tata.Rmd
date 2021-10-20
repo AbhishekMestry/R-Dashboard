@@ -1,0 +1,100 @@
+---
+title: "TATA MOTORS"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: yeti 
+    orientation: rows
+    vertical_layout: fill
+    social: ["facebook" , "twitter" , "menu"]
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(plotly)
+library(tidyquant)
+```
+
+```{r}
+from <- today() - years(5)
+df<- tq_get("TTM", get = "stock.prices", from = from)
+
+```
+
+STOCK DETAILS
+==============================
+
+Row
+-------------------------------------
+
+### Current Open
+```{r}
+valueBox(round(tail(df$open, 1),2), icon ="fa-line-chart",color = "#24d152")
+```
+
+### Current Close
+```{r}
+valueBox(round(tail(df$close, 1),2), icon ="fa-line-chart",color = "#fc9090")
+```
+
+### Current High
+```{r}
+valueBox(round(tail(df$high, 1),2), icon ="fa-line-chart",color = "#c996f2")
+```
+
+### Current Low
+```{r}
+valueBox(round(tail(df$low, 1),2), icon ="fa-line-chart",color = "#b3ed5c")
+```
+
+
+
+Row
+-------------------------------
+
+### ChandleStick Chart
+```{r}
+
+df_last<-tail(df , 30)
+p1 <- plot_ly(x = df_last$date , type = "candlestick",
+                open = df_last$open ,close = df_last$close,
+                high = df_last$high , low = df_last$low)%>%
+  layout(title = "candlestick chart" ,plot_bgcolor = "#b1b5b5",
+                  xaxis = list(title = "Date"),
+         yaxis = list(title = "Closing Price"))
+
+p1
+
+```
+
+### Closing price
+```{r}
+
+p2<-plot_ly(df, type = 'scatter' ,mode = 'lines')%>%
+  add_trace(x = df$date , y = df$close,line = list(color = "#e37f82"))%>%
+  layout(showlegend = F , title = "Closing Price",
+         xaxis = list(rangeslider = list(visible = T)),plot_bgcolor = "#b1b5b5", xaxis = list(title = "Date"),
+         yaxis = list(title = "Closing Price"))
+
+p2
+
+```
+
+Summary
+======================
+Row
+---------------
+### All Time High
+```{r}
+valueBox(round(max(df$high),2),icon = "fa-bar-chart")
+```
+
+### All Time Low
+```{r}
+valueBox(round(min(df$low),2),icon = "fa-bar-chart")
+```
+
+### Volume
+```{r}
+valueBox(tail(df$volume,1),icon= "fa-bar-chart")
+```
+
